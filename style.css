@@ -187,11 +187,11 @@ footer .wrap { display: grid; gap: 10px; }
   .lvl { grid-template-columns: repeat(3, 1fr); }
   .feature { grid-template-columns: 240px 1fr; }
 }
-@media (min-width: 1180px) {
+@media (min-width: 760px) {
   .top { position: sticky; top: 0; }
-  .top .wrap { max-width: 1260px; flex-wrap: nowrap; }
-  .tabs { width: auto; flex: 1; justify-content: center; order: 2; }
-  .langsw { order: 3; margin-left: 0; }
+  .top .wrap { max-width: 1260px; }
+  .langsw { order: 2; margin-left: auto; }
+  .tabs { order: 3; width: 100%; flex-wrap: wrap; overflow: visible; justify-content: center; padding-bottom: 0; }
 }
 @media (min-width: 1000px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
@@ -238,3 +238,13 @@ body.modal-open { overflow: hidden; }
 .legend { font-size: .86rem; color: var(--muted); } .legend .chbtn { min-width: 0; padding: 0 6px; }
 .homily p { font-size: 1.04rem; line-height: 1.75; } .kw { border-left: 3px solid var(--gold); padding: 2px 12px; margin: 10px 0; background: #fffdf6; } .kw i { color: var(--muted); }
 .apply { background: #f3f6fc; border-radius: 12px; padding: 4px 14px; border: 1px solid #dbe4f4; }
+
+.msec { scroll-margin-top: 130px; margin-top: 26px; }
+.mstep { display: grid; grid-template-columns: 86px 1fr; gap: 10px; padding: 10px 12px; margin: 8px 0; border-radius: 12px; border: 1px solid var(--line); background: #fff; }
+.mstep .role { align-self: start; font-size: .74rem; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; text-align: center; background: #eee; color: #444; }
+.mstep .mtxt > div { margin: 0 0 4px; line-height: 1.65; }
+.m-P { border-left: 4px solid var(--crimson); } .m-C { border-left: 4px solid var(--navy); background: #f6f8fd; } .m-R { border-left: 4px solid var(--gold); } .m-D { border-left: 4px solid var(--gold); } .m-A { background: #faf7ef; border-style: dashed; }
+.m-A .mtxt { color: var(--muted); font-style: italic; font-size: .93rem; }
+.role.r-P { background: var(--crimson) !important; color: #fff !important; } .role.r-C { background: var(--navy) !important; color: #fff !important; } .role.r-R, .role.r-D { background: var(--gold) !important; color: #fff !important; }
+.legend2 { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; } .legend2 .role { font-size: .74rem; padding: 3px 10px; border-radius: 999px; background: #eee; }
+@media (max-width: 560px) { .mstep { grid-template-columns: 1fr; } .mstep .role { justify-self: start; } }

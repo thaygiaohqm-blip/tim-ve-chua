@@ -33,7 +33,7 @@
   const refs = a => a && a.length ? `<div class="refs">${a.map(refLink).join('')}</div>` : '';
 
   /* ---- Điều hướng ---- */
-  const TABS = [['home', 'Trang chủ', 'Home'], ['bible', 'Kinh Thánh', 'Bible'], ['calendar', 'Lịch Công giáo', 'Calendar'], ['definitions', 'Định nghĩa', 'Definitions'], ['catechism', 'Giáo lý', 'Catechism'], ['people', 'Danh nhân', 'Saints & People'], ['homily', 'Bài giảng', 'Homilies'], ['prayers', 'Sách kinh', 'Prayers & Books'], ['quiz', 'Kiểm tra', 'Quiz']];
+  const TABS = [['home', 'Trang chủ', 'Home'], ['bible', 'Kinh Thánh', 'Bible'], ['calendar', 'Lịch Công giáo', 'Calendar'], ['definitions', 'Định nghĩa', 'Definitions'], ['catechism', 'Giáo lý', 'Catechism'], ['people', 'Danh nhân', 'Saints & People'], ['mass', 'Thánh lễ', 'Mass'], ['homily', 'Bài giảng', 'Homilies'], ['prayers', 'Sách kinh', 'Prayers & Books'], ['quiz', 'Kiểm tra', 'Quiz']];
   function drawTabs(cur) {
     $('#tabs').innerHTML = TABS.map(t => `<a href="#${t[0]}"${t[0] === cur ? ' aria-current="page"' : ''}>${ENP ? t[2] : t[1]}</a>`).join('');
     $$('.langsw button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === mode));
@@ -364,15 +364,17 @@
 
   /* ---- BÀI GIẢNG KINH THÁNH ---- */
   const NTIDS = () => BOOKS.filter(b => b.t === 'NT');
-  const homNote = () => `<div class="note">${L('Bài giảng do trang biên soạn, dựa trên Kinh Thánh và truyền thống Hội Thánh, nhằm giúp suy niệm; không thay thế huấn quyền hay bài giảng của linh mục. Đợt đầu: tổng quan cả 27 sách Tân Ước, và bài giảng từng chương cho Tin Mừng Máccô (16 chương) và Thư Philípphê (4 chương); các chương khác dùng phần giải thích đoạn Kinh Thánh sẵn có và sẽ được bổ sung dần.', 'Homilies are written for this site from Scripture and Church tradition as aids to meditation; they do not replace the Church’s teaching or a priest’s homily. First release: overviews of all 27 New Testament books, and chapter-by-chapter homilies for Mark (16 chapters) and Philippians (4); other chapters use the existing passage commentary and will be added over time.')}</div>`;
-  const homCount = id => Object.keys(HOMC).filter(k => k.startsWith(id + '.')).length;
+  const homNote = () => `<div class="note">${L('Bài giảng do trang biên soạn, dựa trên Kinh Thánh và truyền thống Hội Thánh, nhằm giúp suy niệm; không thay thế huấn quyền hay bài giảng của linh mục. Mỗi chương trong 27 sách Tân Ước đều có bài giảng riêng theo chủ đề của chương; một số chương có thêm từ khóa nguyên ngữ.', 'Homilies are written for this site from Scripture and Church tradition as aids to meditation; they do not replace the Church’s teaching or a priest’s homily. Every chapter of all 27 New Testament books has its own homily on that chapter’s themes; some include original-language keywords.')}</div>`;
+  const HX = window.HOMX = window.HOMX || {};
+  const getHom = k => { if (HOMC[k]) return HOMC[k]; const x = HX[k]; return x ? { t: [x[0], x[1]], b: [x[2], x[3]], a: [x[4], x[5]], w: x[6] ? [x[6]] : [] } : null; };
+  const homCount = id => new Set(Object.keys(HOMC).concat(Object.keys(HX)).filter(k => k.startsWith(id + '.'))).size;
   function homIndex() {
     return `<div class="page-title">${ART.dove('')}<div><h1>${H('Bài giảng Kinh Thánh', 'Bible Homilies')}</h1>${P('Giải thích ý nghĩa sâu xa của từng lời, từng đoạn Kinh Thánh theo lối bài giảng. Trước mắt là Tân Ước.', 'Homily-style reflections on the deeper meaning of each word and passage of Scripture. For now: the New Testament.')}</div></div>${homNote()}
     <div class="grid2">${NTIDS().map(b => { const h = HOMB.find(x => x[0] === b.id), n = homCount(b.id); return `<a class="card hb" href="#homily-${b.id}"><b>${H(b.vi, b.en)}</b><span class="tag">${b.n} ${L('chương', 'ch.')}${n ? ' · ' + n + ' ' + L('bài giảng chương', 'chapter homilies') : ''}</span>${h ? `<small>${esc(ENP ? h[2] : h[1])}</small>` : ''}</a>`; }).join('')}</div>`;
   }
   function homBook(id) {
     const b = bk(id), h = HOMB.find(x => x[0] === id); if (!b || !h) return homIndex();
-    const ch = Array.from({ length: b.n }, (_, i) => { const k = id + '.' + (i + 1), has = !!HOMC[k], pc = PASS.some(p => p[0] === id && p[1] === i + 1); return `<a class="chbtn${has ? ' has' : pc ? ' pc' : ''}" href="#homily-${id}-${i + 1}" title="${has ? L('Có bài giảng', 'Homily available') : pc ? L('Có giải thích đoạn', 'Passage commentary') : ''}">${i + 1}</a>`; }).join('');
+    const ch = Array.from({ length: b.n }, (_, i) => { const k = id + '.' + (i + 1), has = !!getHom(k), pc = PASS.some(p => p[0] === id && p[1] === i + 1); return `<a class="chbtn${has ? ' has' : pc ? ' pc' : ''}" href="#homily-${id}-${i + 1}" title="${has ? L('Có bài giảng', 'Homily available') : pc ? L('Có giải thích đoạn', 'Passage commentary') : ''}">${i + 1}</a>`; }).join('');
     return `<p><a href="#homily">← ${L('Tất cả các sách', 'All books')}</a></p><h1>${H(b.vi, b.en)}</h1>${homNote()}
     <h2>${L('Tổng quan', 'Overview')}</h2><h3>${L('Chủ đề', 'Theme')}</h3>${P(h[1], h[2])}<h3>${L('Ý nghĩa sâu xa', 'Deeper meaning')}</h3>${P(h[3], h[4])}<h3>${L('Sống Lời Chúa', 'Living the Word')}</h3>${P(h[5], h[6])}
     <h2 style="margin-top:22px">${L('Chọn chương', 'Choose a chapter')}</h2><p class="legend"><span class="chbtn has">●</span> ${L('bài giảng chương', 'chapter homily')} <span class="chbtn pc">●</span> ${L('giải thích đoạn', 'passage commentary')}</p><div class="ch-grid">${ch}</div>
@@ -380,12 +382,12 @@
   }
   async function homChapter(id, chap) {
     const b = bk(id); if (!b || chap < 1 || chap > b.n) return homBook(id);
-    const d = await loadBook(id); const c = d.c[chap - 1]; const k = id + '.' + chap, h = HOMC[k];
+    const d = await loadBook(id); const c = d.c[chap - 1]; const k = id + '.' + chap, h = getHom(k);
     const nav = `<div class="mdl-act">${chap > 1 ? `<a class="btn alt" href="#homily-${id}-${chap - 1}">← ${L('Chương trước', 'Previous')}</a>` : '<span></span>'}<a class="btn alt" href="#homily-${id}">${L('Mục lục', 'Contents')}</a>${chap < b.n ? `<a class="btn" href="#homily-${id}-${chap + 1}">${L('Chương sau', 'Next')} →</a>` : '<span></span>'}</div>`;
     let body = '';
     if (h) {
       body = `<h2>${H(h.t[0], h.t[1])}</h2><div class="homily">${P(h.b[0], h.b[1])}</div>
-      <h3>${L('Từ khóa và ý nghĩa', 'Key words and their meaning')}</h3>${h.w.map(w => `<div class="kw"><b>${esc(w[0])}</b> <i>${esc(w[1])}</i>${P(w[2], w[3])}</div>`).join('')}
+      ${h.w.length ? `<h3>${L('Từ khóa và ý nghĩa', 'Key words and their meaning')}</h3>` : ''}${h.w.map(w => `<div class="kw"><b>${esc(w[0])}</b> <i>${esc(w[1])}</i>${P(w[2], w[3])}</div>`).join('')}
       <h3>${L('Sống Lời Chúa', 'Living the Word')}</h3><div class="apply">${P(h.a[0], h.a[1])}</div>`;
     } else {
       const ps = PASS.filter(p => p[0] === id && p[1] === chap);
@@ -394,6 +396,17 @@
     const vs = c ? (lang === 'en' ? verseRows(c.en, [], 'en', []) : lang === 'vi' || (c.vi.length && c.en.length !== c.vi.length) ? (c.vi.length ? verseRows([], c.vi, 'vi', []) : verseRows(c.en, [], 'en', [])) : verseRows(c.en, c.vi, 'both', [])) : '';
     return `<p><a href="#homily">← ${L('Bài giảng', 'Homilies')}</a> · <a href="#homily-${id}">${esc(bname(id))}</a></p><h1>${H(b.vi, b.en)} ${chap}</h1>${nav}${body}
     <details class="acc" style="margin-top:18px"><summary>${L('Đọc nguyên văn chương này', 'Read the text of this chapter')}</summary><div class="body">${vs}</div></details>${nav}`;
+  }
+
+  /* ---- THÁNH LỄ ---- */
+  const roleHtml = r => `<span class="role r-${r}">${esc(ENP ? MASS_ROLES[r][1] : MASS_ROLES[r][0])}</span>`;
+  const stepHtml = st => `<div class="mstep m-${st[0]}">${roleHtml(st[0])}<div class="mtxt">${BI(st[1], st[2])}</div></div>`;
+  function massPage() {
+    return `<div class="page-title">${ART.cross('')}<div><h1>${H('Thánh lễ', 'The Mass')}</h1>${P('Trình tự đầy đủ một thánh lễ Công giáo: lời chủ tế, lời đáp của cộng đoàn, người đọc, và các chỉ dẫn cử chỉ.', 'The full order of a Catholic Mass: the priest’s words, the people’s responses, the readers, and rubrics for gestures.')}</div></div>
+    <div class="note">${L(MASS_NOTE[0], MASS_NOTE[1])}</div>
+    <div class="legend2">${['P', 'C', 'R', 'A'].map(r => roleHtml(r)).join(' ')}</div>
+    <div class="chips">${MASS.map((m, i) => `<button class="chip" type="button" data-mjump="${i}">${esc(ENP ? m.en : m.vi)}</button>`).join('')}<button class="chip" type="button" data-mjump="p">${L('Tin Lành', 'Protestant')}</button></div>
+    ${MASS.concat([PROT]).map((m, i) => `<section class="msec" id="msec-${i === MASS.length ? 'p' : i}"><h2>${H(m.vi, m.en)}</h2>${P(m.intro[0], m.intro[1])}${m.steps.map(stepHtml).join('')}</section>`).join('')}`;
   }
 
   /* ---- KIỂM TRA ---- */
@@ -442,6 +455,7 @@
       else if (view === 'catechism') html = catPage('');
       else if (view === 'people') html = peoplePage('');
       else if (view === 'prayers') html = prayersPage();
+      else if (view === 'mass') html = massPage();
       else if (view === 'homily') html = parts[1] ? (parts[2] ? await homChapter(parts[1], parseInt(parts[2], 10)) : homBook(parts[1])) : homIndex();
       else if (view === 'library') html = await libPage(parts[1], parseInt(parts[2], 10));
       else if (view === 'quiz') html = quizPage();
@@ -472,6 +486,7 @@
       $('#pq').addEventListener('input', e => { $('#plist').innerHTML = peopleList(e.target.value); });
       $$('[data-cat]').forEach(b => b.addEventListener('click', () => { pCat = b.dataset.cat; route(true); }));
     }
+    if (view === 'mass') $$('[data-mjump]').forEach(b => b.addEventListener('click', () => { const e = document.getElementById('msec-' + b.dataset.mjump); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
     if (view === 'prayers') {
       $$('[data-ptab]').forEach(b => b.addEventListener('click', () => { ptab = b.dataset.ptab; route(true); }));
       $$('[data-rmys]').forEach(b => b.addEventListener('click', () => { rmys = +b.dataset.rmys; route(true); }));
