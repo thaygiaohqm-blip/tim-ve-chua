@@ -106,12 +106,14 @@
 
   /* ---- KINH THÁNH ---- */
   const DEU = ['Tob', 'Jdt', 'Wis', 'Sir', 'Bar', '1Macc', '2Macc'];
+  const OWN = { Dan: [3, 4, 13, 14], Esth: [10, 11, 12, 13, 14, 15, 16] };
+  const isOwn = (id, ch) => DEU.includes(id) || (OWN[id] || []).includes(ch);
   let hl = null; /* câu cần nhấn mạnh sau khi nhảy tham chiếu */
   function bibleIndex() {
     const sec = t => `<div class="bk-grid">${BOOKS.filter(b => b.t === t).map(b => `<a class="bk${DEU.includes(b.id) ? ' deu' : ''}" href="#bible-${b.id}" style="text-decoration:none;color:inherit">${esc(b.vi)}<small>${esc(b.en)}${DEU.includes(b.id) ? ' *' : ''}</small></a>`).join('')}</div>`;
     return `<div class="page-title">${ART.bible('')}<div><h1>${H('Kinh Thánh', 'The Holy Bible')}</h1>${P('Toàn văn 73 sách: tiếng Anh (Douay-Rheims) và tiếng Việt (bản 1925).', 'Full text of 73 books: English (Douay-Rheims) and Vietnamese (1925 version).')}</div></div>
     <form id="jump" class="reader-bar"><input type="text" id="jumpIn" placeholder="${L('Tìm theo địa chỉ, ví dụ: Gioan 3:16 hoặc John 3:16', 'Go to a reference, e.g. John 3:16')}" aria-label="Địa chỉ Kinh Thánh"><button class="btn" type="submit">${L('Đi', 'Go')}</button></form><div id="jumpMsg" class="note" hidden></div>${(() => { const l = store.get('last', ''); const m = l.match(/^(.+)-(\d+)$/); return m && bk(m[1]) ? `<p><a class="btn alt" href="#bible-${l}" style="text-decoration:none;display:inline-block">${L('Tiếp tục đọc: ', 'Continue: ')}${esc(bname(m[1]))} ${m[2]}</a></p>` : ''; })()}
-    <div class="note">${L('Sách đánh dấu * (nét đứt) là các sách Đệ nhị kinh điển của Kinh Thánh Công giáo: hiện chỉ có tiếng Anh vì chưa có bản tiếng Việt thuộc phạm vi công cộng. Bản Việt 1925 là bản Tin Lành, nên một số tên riêng khác với bản Công giáo.', 'Books marked * (dashed) are the deuterocanonical books of the Catholic Bible: English only for now, since no public-domain Vietnamese text exists. The 1925 Vietnamese text is a Protestant version, so some proper names differ from Catholic usage.')}</div>
+    <div class="note">${L('Sách đánh dấu * (nét đứt) là các sách Đệ nhị kinh điển của Kinh Thánh Công giáo. Vì bản tiếng Việt chuẩn (Nhóm Phiên Dịch các Giáo Phận Việt Nam) còn trong phạm vi bản quyền nên không thể sao chép, tiếng Việt của các sách này là bản tự dịch của trang từ Douay-Rheims, chưa phải bản chuẩn của Giáo hội. Bản Việt 1925 là bản Tin Lành, nên một số tên riêng khác với bản Công giáo.', 'Books marked * (dashed) are the deuterocanonical books of the Catholic Bible. The standard Vietnamese Catholic text is still under copyright and cannot be copied, so the Vietnamese for these books is this site’s own translation from the Douay-Rheims, not the Church’s standard version. The 1925 Vietnamese text is a Protestant version, so some proper names differ from Catholic usage.')}</div>
     <h3>${H('Cựu Ước (46 sách)', 'Old Testament (46 books)')}</h3>${sec('OT')}<h3>${H('Tân Ước (27 sách)', 'New Testament (27 books)')}</h3>${sec('NT')}`;
   }
   function parseJump(s) {
@@ -167,6 +169,7 @@
     <div class="reader-bar"><select id="selBook" aria-label="Sách">${opts}</select><select id="selCh" aria-label="Chương">${chopts}</select></div>
     <div class="reader"><h2>${H(b.vi + ' ' + chap, b.en + ' ' + chap)}</h2>${chap === 1 ? '' : ''}${intro}${body}</div>
     <div class="pager"><button class="btn alt" type="button" data-go="${prev || ''}" ${prev ? '' : 'disabled'}>← ${L('Trước', 'Previous')}</button><button class="btn" type="button" data-go="${next || ''}" ${next ? '' : 'disabled'}>${L('Sau', 'Next')} →</button></div>
+    ${isOwn(id, chap) ? `<div class="note">${L('Tiếng Việt của chương này là <b>bản tự dịch của trang</b> từ Douay-Rheims, không phải bản chuẩn của Giáo hội. Xin đối chiếu với bản chuẩn tại <a href="https://www.vatican.va/archive/ENG0839/_INDEX.HTM" target="_blank" rel="noopener">Vatican</a> hoặc <a href="https://hdgmvietnam.com/chi-tiet/kinh-thanh-tron-bo-1" target="_blank" rel="noopener">hdgmvietnam.com</a>.', 'The Vietnamese for this chapter is <b>this site’s own translation</b> from the Douay-Rheims, not the Church’s standard version. Please compare with the standard text at <a href="https://www.vatican.va/archive/ENG0839/_INDEX.HTM" target="_blank" rel="noopener">the Vatican</a> or <a href="https://hdgmvietnam.com/chi-tiet/kinh-thanh-tron-bo-1" target="_blank" rel="noopener">hdgmvietnam.com</a>.')}</div>` : ''}
     <div class="srcnote">${L('Tiếng Anh: Douay-Rheims 1899. Tiếng Việt: bản 1925. Các ô “Giải thích” là phần chú giải của trang này.', 'English: Douay-Rheims 1899. Vietnamese: 1925 version. “Commentary” boxes are this site’s own notes.')}</div>`;
   }
 
