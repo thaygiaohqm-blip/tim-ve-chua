@@ -367,7 +367,7 @@
 
   /* ---- BÀI GIẢNG KINH THÁNH ---- */
   const NTIDS = () => BOOKS.filter(b => b.t === 'NT');
-  const homNote = () => `<div class="note">${L('Bài giảng do trang biên soạn, dựa trên Kinh Thánh và truyền thống Hội Thánh, nhằm giúp suy niệm; không thay thế huấn quyền hay bài giảng của linh mục. Mỗi chương trong 27 sách Tân Ước đều có bài giảng riêng theo chủ đề của chương; một số chương có thêm từ khóa nguyên ngữ.', 'Homilies are written for this site from Scripture and Church tradition as aids to meditation; they do not replace the Church’s teaching or a priest’s homily. Every chapter of all 27 New Testament books has its own homily on that chapter’s themes; some include original-language keywords.')}</div>`;
+  const homNote = () => `<div class="note">${L('Bài giảng do trang biên soạn, dựa trên Kinh Thánh và truyền thống Hội Thánh, nhằm giúp suy niệm; không thay thế huấn quyền hay bài giảng của linh mục. Mỗi chương trong 27 sách Tân Ước đều có bài giảng riêng theo chủ đề của chương; một số chương có thêm từ khóa nguyên ngữ. Mọi đoạn lời Chúa Giêsu phán trong các sách có đánh dấu gạch vàng đều được giải thích ẩn ý và bài học ở cuối bài giảng chương.', 'Homilies are written for this site from Scripture and Church tradition as aids to meditation; they do not replace the Church’s teaching or a priest’s homily. Every chapter of all 27 New Testament books has its own homily on that chapter’s themes; some include original-language keywords. Every saying of Jesus in the books marked with a gold underline is explained, with its hidden meaning and lesson, at the end of the chapter homily.')}</div>`;
   const HX = window.HOMX = window.HOMX || {};
   const getHom = k => { if (HOMC[k]) return HOMC[k]; const x = HX[k]; return x ? { t: [x[0], x[1]], b: [x[2], x[3]], a: [x[4], x[5]], w: x[6] ? [x[6]] : [] } : null; };
   const homCount = id => new Set(Object.keys(HOMC).concat(Object.keys(HX)).filter(k => k.startsWith(id + '.'))).size;
@@ -377,11 +377,24 @@
   }
   function homBook(id) {
     const b = bk(id), h = HOMB.find(x => x[0] === id); if (!b || !h) return homIndex();
-    const ch = Array.from({ length: b.n }, (_, i) => { const k = id + '.' + (i + 1), has = !!getHom(k), pc = PASS.some(p => p[0] === id && p[1] === i + 1); return `<a class="chbtn${has ? ' has' : pc ? ' pc' : ''}" href="#homily-${id}-${i + 1}" title="${has ? L('Có bài giảng', 'Homily available') : pc ? L('Có giải thích đoạn', 'Passage commentary') : ''}">${i + 1}</a>`; }).join('');
+    const ch = Array.from({ length: b.n }, (_, i) => { const k = id + '.' + (i + 1), has = !!getHom(k), pc = PASS.some(p => p[0] === id && p[1] === i + 1), wd = WORDS.some(w => w[0] === id && w[1] === i + 1); return `<a class="chbtn${has ? ' has' : pc ? ' pc' : ''}${wd ? ' wd' : ''}" href="#homily-${id}-${i + 1}" title="${wd ? L('Có giải thích lời Chúa phán', 'Includes the Lord’s words explained') : has ? L('Có bài giảng', 'Homily available') : pc ? L('Có giải thích đoạn', 'Passage commentary') : ''}">${i + 1}</a>`; }).join('');
     return `<p><a href="#homily">← ${L('Tất cả các sách', 'All books')}</a></p><h1>${H(b.vi, b.en)}</h1>${homNote()}
     <h2>${L('Tổng quan', 'Overview')}</h2><h3>${L('Chủ đề', 'Theme')}</h3>${P(h[1], h[2])}<h3>${L('Ý nghĩa sâu xa', 'Deeper meaning')}</h3>${P(h[3], h[4])}<h3>${L('Sống Lời Chúa', 'Living the Word')}</h3>${P(h[5], h[6])}
-    <h2 style="margin-top:22px">${L('Chọn chương', 'Choose a chapter')}</h2><p class="legend"><span class="chbtn has">●</span> ${L('bài giảng chương', 'chapter homily')} <span class="chbtn pc">●</span> ${L('giải thích đoạn', 'passage commentary')}</p><div class="ch-grid">${ch}</div>
+    <h2 style="margin-top:22px">${L('Chọn chương', 'Choose a chapter')}</h2><p class="legend"><span class="chbtn has">●</span> ${L('bài giảng chương', 'chapter homily')} <span class="chbtn pc">●</span> ${L('giải thích đoạn', 'passage commentary')} <span class="chbtn has wd">●</span> ${L('có giải thích lời Chúa phán', 'Lord’s words explained')}</p><div class="ch-grid">${ch}</div>
     <p><a class="btn alt" href="#bible-${id}">${L('Đọc sách này trong Kinh Thánh', 'Read this book in the Bible')}</a></p>`;
+  }
+  const WORDS = window.WORDS = window.WORDS || [];
+  const wordsOf = (id, ch) => WORDS.filter(w => w[0] === id && w[1] === ch).sort((a, b) => a[2] - b[2]);
+  const wordsCount = id => WORDS.filter(w => w[0] === id).length;
+  function wordsBlock(id, chap, c) {
+    const ws = wordsOf(id, chap); if (!ws.length) return '';
+    const txt = w => { const arr = (lang === 'en' || !c.vi.length) ? c.en : c.vi; return arr.slice(w[2] - 1, w[3]).map((v, i) => `<span class="wv"><sup>${w[2] + i}</sup> ${esc(v)}</span>`).join(' '); };
+    return `<h3 class="wtitle">${L('Lời Chúa phán và ý nghĩa', 'The Lord’s words and their meaning')}</h3>
+    <p class="legend">${L('Mỗi đoạn dưới đây là lời Chúa Giêsu (hay lời Chúa phán) trong chương này, kèm ẩn ý và bài học.', 'Each passage below is a saying of Jesus (or of the Lord) in this chapter, with its hidden meaning and lesson.')}</p>
+    ${ws.map(w => `<div class="word"><div class="wref">${esc(bname(id))} ${chap}:${w[2]}${w[3] > w[2] ? '–' + w[3] : ''}</div><h4>${H(w[4], w[5])}</h4>
+    <details class="wtext"><summary>${L('Xem nguyên văn', 'Show the text')}</summary><div>${txt(w)}</div></details>
+    <div class="wmean"><b>${L('Ẩn ý', 'Hidden meaning')}</b>${P(w[6], w[7])}</div>
+    <div class="wlesson"><b>${L('Bài học', 'Lesson')}</b>${P(w[8], w[9])}</div></div>`).join('')}`;
   }
   async function homChapter(id, chap) {
     const b = bk(id); if (!b || chap < 1 || chap > b.n) return homBook(id);
@@ -396,6 +409,7 @@
       const ps = PASS.filter(p => p[0] === id && p[1] === chap);
       body = `<div class="note">${L('Bài giảng riêng cho chương này đang được biên soạn.', 'A dedicated homily for this chapter is in preparation.')}${ps.length ? ' ' + L('Trong lúc chờ, đây là phần giải thích các đoạn đã có:', 'Meanwhile, here are the passage commentaries already written:') : ''}</div>${ps.map(comm).join('')}`;
     }
+    body += c ? wordsBlock(id, chap, c) : '';
     const vs = c ? (lang === 'en' ? verseRows(c.en, [], 'en', []) : lang === 'vi' || (c.vi.length && c.en.length !== c.vi.length) ? (c.vi.length ? verseRows([], c.vi, 'vi', []) : verseRows(c.en, [], 'en', [])) : verseRows(c.en, c.vi, 'both', [])) : '';
     return `<p><a href="#homily">← ${L('Bài giảng', 'Homilies')}</a> · <a href="#homily-${id}">${esc(bname(id))}</a></p><h1>${H(b.vi, b.en)} ${chap}</h1>${nav}${body}
     <details class="acc" style="margin-top:18px"><summary>${L('Đọc nguyên văn chương này', 'Read the text of this chapter')}</summary><div class="body">${vs}</div></details>${nav}`;

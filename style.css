@@ -248,3 +248,14 @@ body.modal-open { overflow: hidden; }
 .role.r-P { background: var(--crimson) !important; color: #fff !important; } .role.r-C { background: var(--navy) !important; color: #fff !important; } .role.r-R, .role.r-D { background: var(--gold) !important; color: #fff !important; }
 .legend2 { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; } .legend2 .role { font-size: .74rem; padding: 3px 10px; border-radius: 999px; background: #eee; }
 @media (max-width: 560px) { .mstep { grid-template-columns: 1fr; } .mstep .role { justify-self: start; } }
+
+.wtitle{margin-top:28px;border-top:2px solid var(--line,#ddd);padding-top:14px}
+.word{margin:14px 0;padding:12px 14px;border-left:4px solid #b8860b;background:rgba(184,134,11,.07);border-radius:6px}
+.word h4{margin:2px 0 6px}
+.wref{font-size:.8em;opacity:.75;font-weight:600}
+.wtext{margin:6px 0 8px;font-size:.95em}
+.wtext summary{cursor:pointer;opacity:.85}
+.wtext .wv{display:inline}
+.wmean b,.wlesson b{display:block;font-size:.85em;text-transform:uppercase;letter-spacing:.04em;opacity:.8;margin-top:6px}
+.wlesson{border-top:1px dashed rgba(0,0,0,.2);margin-top:8px}
+.chbtn.wd{box-shadow:inset 0 -3px 0 #b8860b}
